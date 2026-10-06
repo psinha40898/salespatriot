@@ -8,7 +8,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000/dibbs. The homepage keeps the standard Next.js template.
+Open http://localhost:3000. The homepage redirects to `/dibbs`.
 
 For AI search, create `.env.local` with `OPENAI_API_KEY=your-key` (Git-ignored).
 The default model is `gpt-6-luna` with low reasoning effort; optionally set `OPENAI_MODEL` to a compatible OpenAI model.
@@ -40,7 +40,7 @@ npm start
 - `components/dibbs/ai-search.tsx`: AI search bar; `useChat` receives the tool call and applies it through the live form. API keys remain server-side.
 - `app/dibbs/layout.tsx` and `app/globals.css`: desktop layout and the route's charcoal/lime shadcn theme tokens.
 - `app/dibbs/loading.tsx`: skeleton loading state.
-- `app/page.tsx`: one link to `/dibbs` added to the template.
+- `app/page.tsx`: redirects the homepage to `/dibbs`.
 
 The first 14 entries are posting dates, not necessarily 14 consecutive calendar days. DIBBS publishes complete daily index files one day later.
 
