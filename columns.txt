@@ -1,0 +1,24 @@
+DIBBS RFQ index columns
+Source: https://www.dibbs.bsm.dla.mil/Rfq/RfqFileDefs.aspx
+See "Index Text" -> "File Layout" for the official names and field widths.
+
+Solicitation # - Identifier for the government request for quotes. One solicitation can request multiple items.
+NSN / Part # - Item identifier: either a government National Stock Number (NSN) or a manufacturer's part number, according to the item type indicator.
+Purchase Request # - Government procurement tracking reference.
+Return By Date - Quote submission deadline date, not the delivery date. Exact cutoff time is in the full solicitation.
+File Name - Filename of the full solicitation document.
+QTY - Number of units requested for this item.
+Unit Issue - What each unit represents; EA means each, PR means pair.
+Nomenclature - Short item description, limited to 21 characters in the index.
+Buyer Code - Identifier for the responsible buyer.
+AMSC - Acquisition Method Suffix Code; provides sourcing restrictions or guidance. Consult the solicitation for its implications.
+Item Type Indicator - 1 = NSN; 2 = part number.
+Small Business Set-Aside Indicator - Business category for which the opportunity is reserved: Y = small business; H = HUBZone; R = service-disabled veteran-owned small business; L = women-owned small business; A = 8(a); E = economically disadvantaged women-owned small business; N = unrestricted/not set aside.
+Small Business Set-Aside Percentage - Percentage reserved for the indicated business category; 100 means fully set aside.
+
+Derived fields (not separate index columns)
+FSC - Federal Supply Class: the first four digits of an NSN, grouping related items. Only derive this for item type 1.
+Posting Date - Date associated with the downloaded index file. Not necessarily the solicitation's issue date.
+
+Each fixed-width row describes one requested item within a solicitation.
+The index is a posting snapshot; it does not guarantee the RFQ is still open or unchanged.
