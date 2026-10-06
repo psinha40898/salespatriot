@@ -20,7 +20,7 @@ function Deadline({ item, today }: { item: RfqItem; today: string }) {
 
 function SetAside({ item }: { item: RfqItem }) {
   return (
-    <Badge variant="outline" className={`max-w-44 whitespace-normal rounded-sm px-2 py-1 text-[11px] font-normal leading-4 ${item.setAside !== "N" ? "border-primary/20 bg-primary/5 text-primary" : "text-muted-foreground"}`}>
+    <Badge variant="outline" className={`h-auto max-w-44 whitespace-normal rounded-sm px-2 py-1 text-[11px] font-normal leading-4 ${item.setAside !== "N" ? "border-primary/20 bg-primary/5 text-primary" : "text-muted-foreground"}`}>
       {SET_ASIDES[item.setAside] ?? "Check DIBBS"}
     </Badge>
   );
