@@ -68,7 +68,6 @@ export function RfqFilters({ filters, categories, activeCount }: {
         </fieldset>
       </div>
       <div className="flex gap-2 lg:flex-col">
-        <Button type="submit" className="h-10 flex-1 lg:w-full">Apply filters</Button>
         <Button variant="ghost" asChild className="h-10 text-muted-foreground"><Link href="/dibbs"><RotateCcw className="size-3.5" /> Reset all</Link></Button>
       </div>
       <Separator />

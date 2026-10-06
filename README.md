@@ -24,7 +24,7 @@ npm start
 - `instrumentation.ts`: starts the import when the Node.js server starts; skips build-time imports.
 - `lib/dibbs-records.ts`: fixed-width parsing, identifier formatting, source URLs, search, filtering, and sorting.
 - `app/dibbs/page.tsx`: server-side filtering and 25-item pagination. Filters persist in the URL.
-- `components/dibbs/`: filter controls, the opportunity table, and a small client component for automatic sort submission.
+- `components/dibbs/`: filter controls, the opportunity table, and a small client form for live URL updates. Search/quantity inputs debounce for 300ms; dropdowns apply immediately, with pending feedback and preserved input focus.
 - `components/ui/`: shadcn components, generated with the CLI.
 - `app/dibbs/layout.tsx` and `app/globals.css`: desktop layout and the route's charcoal/lime shadcn theme tokens.
 - `app/dibbs/loading.tsx`: skeleton loading state.

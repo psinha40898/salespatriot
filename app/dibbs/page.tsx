@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import Form from "next/form";
 import Link from "next/link";
-import { ArrowUpRight, ArrowLeft, ArrowRight, Search, X, SearchX, AlertCircle } from "lucide-react";
+import { ArrowUpRight, ArrowLeft, ArrowRight, Search, X, SearchX, AlertCircle, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RfqFilters } from "@/components/dibbs/filters";
 import { OpportunityList } from "@/components/dibbs/opportunity-list";
 import { SortSelect } from "@/components/dibbs/sort-select";
+import { LiveForm } from "@/components/dibbs/live-form";
 import { getDibbsData } from "@/lib/dibbs";
 import { currentDate } from "@/lib/dibbs-dates";
 import { SET_ASIDES, parseRecord, filterRecords, type Filters } from "@/lib/dibbs-records";
@@ -76,14 +76,19 @@ export default async function DibbsPage({ searchParams }: PageProps<"/dibbs">) {
         </dl>
       </section>
 
-      <Form action="/dibbs" scroll={false} key={JSON.stringify(filters)}>
+      <LiveForm>
         <div className="mb-9 flex items-center gap-3 border-b border-border pb-6">
           <div className="relative flex-1"><Search className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input name="q" defaultValue={filters.q} aria-label="Search opportunities" placeholder="Search items, NSNs, part numbers, or solicitations…" className="h-12 rounded-sm bg-muted/20 pl-11 text-sm" /></div>
-          <Button type="submit" className="h-12 rounded-sm px-5 sm:px-7">Search <ArrowRight className="hidden size-4 sm:block" /></Button>
+          <span className="hidden items-center gap-2 whitespace-nowrap font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:flex">
+            <span className="size-1.5 rounded-full bg-primary group-data-[pending=true]/live:hidden" />
+            <LoaderCircle className="hidden size-3 animate-spin text-primary group-data-[pending=true]/live:block" />
+            <span className="group-data-[pending=true]/live:hidden">Live search</span>
+            <span className="hidden group-data-[pending=true]/live:inline">Updating</span>
+          </span>
         </div>
         <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
           <RfqFilters filters={filters} categories={categories} activeCount={active.length} />
-          <section className="min-w-0" aria-label="Opportunity results">
+          <section className="min-w-0 transition-opacity group-data-[pending=true]/live:opacity-60" aria-label="Opportunity results">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
               <div><h2 className="text-sm font-medium">{results.length.toLocaleString()} matching items</h2><p className="mt-1 text-xs text-muted-foreground">Return-by dates today or later · Updated {updated}</p></div>
               <SortSelect value={filters.sort} />
@@ -101,7 +106,7 @@ export default async function DibbsPage({ searchParams }: PageProps<"/dibbs">) {
             </div>
           </section>
         </div>
-      </Form>
+      </LiveForm>
       <footer className="mt-12 flex flex-wrap justify-between gap-3 border-t border-border pt-5 font-mono text-[10px] leading-5 text-muted-foreground"><span>PUBLIC DIBBS POSTINGS · {loaded} RECENT POSTING DATES</span><span>Confirm current status, requirements, and exact closing time on DIBBS.</span></footer>
     </main>
   );
