@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useTransition, type ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AiSearch } from "./ai-search";
+import type { Filters } from "@/lib/dibbs-records";
 
 export function LiveForm({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -32,6 +34,23 @@ export function LiveForm({ children }: { children: ReactNode }) {
     startTransition(() => router.replace(`/dibbs${nextQuery ? `?${nextQuery}` : ""}`, { scroll: false }));
   }
 
+  function applyAiFilters(filters: Filters) {
+    const fields = Array.from(form.current?.elements ?? []).filter(
+      (field): field is HTMLInputElement | HTMLSelectElement => field instanceof HTMLInputElement || field instanceof HTMLSelectElement,
+    );
+    // Validate all dropdowns before changing anything (e.g. an FSC not loaded).
+    for (const field of fields) {
+      const value = filters[field.name as keyof Filters];
+      if (field instanceof HTMLSelectElement && !Array.from(field.options).some((option) => option.value === value)) {
+        throw new Error(`The requested ${field.name} is not available in the loaded postings.`);
+      }
+    }
+    cancelDebounce();
+    ownNavigations.current.clear();
+    for (const field of fields) field.value = filters[field.name as keyof Filters] ?? "";
+    updateResults();
+  }
+
   useEffect(() => {
     // Our own result updates must not reset input values or steal focus from a
     // user who has already typed the next character. External navigation (reset,
@@ -56,6 +75,8 @@ export function LiveForm({ children }: { children: ReactNode }) {
   }, []);
 
   return (
+    <>
+    <AiSearch onApply={applyAiFilters} />
     <form ref={form} action="/dibbs" method="get" className="group/live" data-pending={pending} aria-busy={pending}
       onSubmit={(event) => { event.preventDefault(); updateResults(); }}
       onChange={(event) => {
@@ -73,5 +94,6 @@ export function LiveForm({ children }: { children: ReactNode }) {
       {children}
       <span role="status" className="sr-only">{pending ? "Updating results" : "Results updated"}</span>
     </form>
+    </>
   );
 }

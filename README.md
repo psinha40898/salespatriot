@@ -10,6 +10,12 @@ npm run dev
 
 Open http://localhost:3000/dibbs. The homepage keeps the standard Next.js template.
 
+For AI search, create `.env.local` with `OPENAI_API_KEY=your-key` (Git-ignored).
+The default model is `gpt-6-luna` with low reasoning effort; optionally set `OPENAI_MODEL` to a compatible OpenAI model.
+Submit a natural-language request in the AI bar. Each submission replaces the filters and sort;
+the regular controls remain editable. Unsupported constraints produce an explanation.
+The model receives the search request and filter definitions, not the RFQ dataset.
+
 For a production-style local demo:
 
 ```sh
@@ -26,6 +32,9 @@ npm start
 - `app/dibbs/page.tsx`: server-side filtering and 25-item pagination. Filters persist in the URL.
 - `components/dibbs/`: filter controls, the opportunity table, and a small client form for live URL updates. Search/quantity inputs debounce for 300ms; dropdowns apply immediately, with pending feedback and preserved input focus.
 - `components/ui/`: shadcn components, generated with the CLI.
+- `lib/ai-filters.ts`: shared validation and conversion from AI tool input to existing filters.
+- `app/api/ai-search/route.ts`: OpenAI request with a client-side `setFilters` tool using the Vercel AI SDK.
+- `components/dibbs/ai-search.tsx`: AI search bar; `useChat` receives the tool call and applies it through the live form. API keys remain server-side.
 - `app/dibbs/layout.tsx` and `app/globals.css`: desktop layout and the route's charcoal/lime shadcn theme tokens.
 - `app/dibbs/loading.tsx`: skeleton loading state.
 - `app/page.tsx`: one link to `/dibbs` added to the template.
