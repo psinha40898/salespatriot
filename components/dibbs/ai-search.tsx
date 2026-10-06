@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
-import { LoaderCircle, Sparkles } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toBrowserFilters } from "@/lib/ai-filters";
@@ -55,16 +55,16 @@ export function AiSearch({ onApply }: { onApply: (filters: Filters) => void }) {
         clearError(); setFeedback(""); setMessages([]); applied.current = false;
         void sendMessage({ text: input.trim() });
       }}>
-      <label htmlFor="ai-search" className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-primary"><Sparkles className="size-3.5" /> AI search</label>
+      <label htmlFor="ai-search" className="font-mono text-[11px] uppercase tracking-wider text-primary">AI search</label>
       <div className="flex gap-3">
         <Input id="ai-search" value={input} onChange={(event) => setInput(event.target.value)} maxLength={1000} disabled={busy}
           placeholder="Shirts with at least 500 units, due in the next 7 days" className="h-11 rounded-sm bg-background" />
         <Button type="submit" disabled={busy || !input.trim()} className="h-11 rounded-sm px-4">
-          {busy ? <LoaderCircle className="size-4 animate-spin" /> : <Sparkles className="size-4" />}{busy ? "Thinking…" : "Find opportunities"}
+          {busy && <LoaderCircle className="size-4 animate-spin" />}{busy ? "Thinking…" : "Search"}
         </Button>
       </div>
       <p role={error ? "alert" : "status"} className={error ? "text-xs text-destructive" : "text-xs leading-5 text-muted-foreground"}>
-        {error?.message || feedback || "Describe what you need. AI sets the search, filters, and sort below. Each search starts fresh."}
+        {error?.message || feedback || "Each AI search replaces the filters below."}
       </p>
     </form>
   );

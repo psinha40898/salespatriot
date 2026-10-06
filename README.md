@@ -14,6 +14,9 @@ For AI search, create `.env.local` with `OPENAI_API_KEY=your-key` (Git-ignored).
 The default model is `gpt-6-luna` with low reasoning effort; optionally set `OPENAI_MODEL` to a compatible OpenAI model.
 Submit a natural-language request in the AI bar. Each submission replaces the filters and sort;
 the regular controls remain editable. Unsupported constraints produce an explanation.
+Set-aside and FSC filters support multiple selections: OR within each filter, AND across filters.
+For example, "all women-owned set-asides" selects both women-owned and economically disadvantaged women-owned.
+These selections use comma-separated URL values (e.g. `setAside=L,E`); existing single-value links still work.
 The model receives the search request and filter definitions, not the RFQ dataset.
 
 For a production-style local demo:

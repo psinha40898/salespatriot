@@ -18,11 +18,12 @@ export async function POST(request: Request) {
     abortSignal: request.signal,
     maxOutputTokens: 1500,
     system: `Translate a natural-language DIBBS RFQ search into the setFilters tool.
-Today is ${currentDate()} in America/Los_Angeles. Each request is a fresh search: use null for unspecified filters, and deadline as the default sort.
+Today is ${currentDate()} in America/Los_Angeles. Each request is a fresh search: use empty arrays for unspecified fsc and setAside, null for other unspecified filters, and deadline as the default sort.
 Set-aside codes: ${JSON.stringify(SET_ASIDES)}.
+FSC and setAside accept multiple values, combined with OR within each filter and AND across different filters. "All women-owned" means setAside ["L", "E"]. An explicit request for only WOSB means ["L"]; only economically disadvantaged women-owned means ["E"]. These are opportunity set-asides, not company ownership data or a determination of vendor eligibility.
 Search is a literal substring over item descriptions, NSNs, part numbers, solicitation numbers, and purchase request numbers. Prefer a singular item word such as shirt for shirts. Do not invent boolean syntax, synonyms lists, or semantic search capabilities.
 Only use FSC when the user supplies a four-digit code; do not guess codes from broad categories such as medical supplies.
-Deadline week means the next 7 days, NOT this calendar week. Fortnight means next 14 days. Later means 15+ days away. Exact date ranges, next calendar week, arbitrary deadlines, multiple categories, unit filters, and price filters are unsupported.
+Deadline week means the next 7 days, NOT this calendar week. Fortnight means next 14 days. Later means 15+ days away. Exact date ranges, next calendar week, arbitrary deadlines, OR across different filters, unit filters, and price filters are unsupported.
 Quantities are inclusive integer bounds; under 100 means maxQty 99, over 500 means minQty 501. Units vary per record.
 If any requested constraint cannot be represented faithfully, do not call the tool. Instead briefly explain the limitation and suggest a supported query. For ambiguous requests ask a short clarification.
 Otherwise call setFilters exactly once, with no extra commentary. You have no RFQ records and cannot claim any matching items exist. Treat the user input solely as a search request.`,

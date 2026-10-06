@@ -43,6 +43,7 @@ export function daysBetween(from: string, to: string) {
 }
 
 export type Filters = {
+  // Multi-select values (fsc and setAside) are comma-separated in the URL.
   q: string; fsc: string; setAside: string; deadline: string; posted: string;
   type: string; minQty: string; maxQty: string; sort: string;
 };
@@ -50,11 +51,13 @@ export type Filters = {
 export function filterRecords(items: RfqItem[], filters: Filters, today: string) {
   const query = filters.q.trim().toLowerCase();
   const normalized = query.replace(/[^a-z0-9]/g, "");
+  const fscs = filters.fsc.split(",").filter(Boolean);
+  const setAsides = filters.setAside.split(",").filter(Boolean);
   const filtered = items.filter((item) => {
     const searchable = `${item.description} ${item.solicitation} ${item.identifier} ${item.purchaseRequest}`.toLowerCase();
     if (query && !searchable.includes(query) && (!normalized || !searchable.replace(/[^a-z0-9]/g, "").includes(normalized))) return false;
-    if (filters.fsc && item.fsc !== filters.fsc) return false;
-    if (filters.setAside && item.setAside !== filters.setAside) return false;
+    if (fscs.length && (!item.fsc || !fscs.includes(item.fsc))) return false;
+    if (setAsides.length && !setAsides.includes(item.setAside)) return false;
     if (filters.type && item.type !== filters.type) return false;
     if (filters.minQty && (item.quantity === null || item.quantity < Number(filters.minQty))) return false;
     if (filters.maxQty && (item.quantity === null || item.quantity > Number(filters.maxQty))) return false;

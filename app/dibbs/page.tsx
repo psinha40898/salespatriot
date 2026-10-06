@@ -23,7 +23,7 @@ function EmptyState({ title, children }: { title: string; children: ReactNode })
 
 export default async function DibbsPage({ searchParams }: PageProps<"/dibbs">) {
   const params = await searchParams;
-  const get = (name: string) => typeof params[name] === "string" ? params[name] as string : "";
+  const get = (name: string) => Array.isArray(params[name]) ? params[name].join(",") : params[name] ?? "";
   const filters: Filters = {
     q: get("q"), fsc: get("fsc"), setAside: get("setAside"), deadline: get("deadline"),
     posted: get("posted"), type: get("type"), minQty: get("minQty"), maxQty: get("maxQty"), sort: get("sort") || "deadline",
@@ -50,7 +50,8 @@ export default async function DibbsPage({ searchParams }: PageProps<"/dibbs">) {
   const active = Object.entries(filters).filter(([key, value]) => key !== "sort" && value);
   const deadlineLabels: Record<string, string> = { today: "Due today", week: "Due within 7 days", fortnight: "Due within 14 days", later: "15+ days to quote" };
   const chipLabels: Record<string, string> = {
-    q: `“${filters.q}”`, fsc: `FSC ${filters.fsc}`, setAside: SET_ASIDES[filters.setAside] ?? filters.setAside,
+    q: `“${filters.q}”`, fsc: `FSC ${filters.fsc.split(",").join(" or ")}`,
+    setAside: filters.setAside.split(",").map((code) => SET_ASIDES[code] ?? code).join(" or "),
     deadline: deadlineLabels[filters.deadline] ?? filters.deadline, posted: `Posted: last ${filters.posted} days`,
     type: filters.type === "nsn" ? "NSN only" : "Part number only", minQty: `Qty ≥ ${filters.minQty}`, maxQty: `Qty ≤ ${filters.maxQty}`,
   };
@@ -65,9 +66,7 @@ export default async function DibbsPage({ searchParams }: PageProps<"/dibbs">) {
     <main className="mx-auto w-full max-w-[1480px] px-5 py-10 sm:px-8 lg:px-12 lg:py-14">
       <section className="mb-10 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">DLA procurement / RFQs</p>
           <h1 className="text-4xl font-medium tracking-tight sm:text-5xl">Opportunities<span className="text-primary">.</span></h1>
-          <p className="mt-4 max-w-lg text-sm leading-6 text-muted-foreground">Find the items you can supply. Focus on the quotes worth making.</p>
         </div>
         <dl className="flex gap-7 sm:gap-10">
           {[["Available items", items.length], ["Solicitations", new Set(items.map((item) => item.solicitation)).size], ["Posting dates", loaded]].map(([label, count]) => (

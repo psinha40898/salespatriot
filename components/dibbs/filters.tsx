@@ -21,6 +21,31 @@ function FilterSelect({ name, label, value, children }: {
   );
 }
 
+function MultiFilter({ name, label, value, options }: {
+  name: string; label: string; value: string; options: [string, string][];
+}) {
+  const selected = value.split(",").filter(Boolean);
+  // Preserve selections from shared URLs even if an FSC has no current rows.
+  const choices = [...options, ...selected.filter((code) => !options.some(([key]) => key === code)).map((code): [string, string] => [code, code])];
+  return (
+    <fieldset className="min-w-0 space-y-2">
+      <legend className="mb-2 text-xs text-muted-foreground">{label}</legend>
+      <details className="rounded-sm border border-input bg-background">
+        <summary className="cursor-pointer px-3 py-2.5 text-xs">{selected.length ? `${selected.length} selected` : "All"}</summary>
+        <div className="max-h-64 space-y-1 overflow-y-auto border-t border-border p-2">
+          {choices.map(([code, text]) => (
+            <label key={code} className="flex cursor-pointer items-start gap-2 rounded-sm p-1.5 text-xs leading-5 hover:bg-muted">
+              <Input type="checkbox" name={name} value={code} defaultChecked={selected.includes(code)} className="mt-1 size-3.5 shrink-0 rounded-sm p-0 accent-primary" />
+              <span>{text}</span>
+            </label>
+          ))}
+        </div>
+      </details>
+      <p className="text-[11px] text-muted-foreground">Matches any selected. None selected means all.</p>
+    </fieldset>
+  );
+}
+
 export function RfqFilters({ filters, categories, activeCount }: {
   filters: Filters; categories: [string, number][]; activeCount: number;
 }) {
@@ -31,10 +56,8 @@ export function RfqFilters({ filters, categories, activeCount }: {
         {activeCount > 0 && <span className="font-mono text-xs text-muted-foreground">{activeCount} active</span>}
       </div>
       <div className="grid grid-cols-2 gap-5 lg:grid-cols-1">
-        <FilterSelect name="fsc" label="FSC / item category" value={filters.fsc}>
-          <NativeSelectOption value="">All supply classes</NativeSelectOption>
-          {categories.map(([code, count]) => <NativeSelectOption key={code} value={code}>FSC {code} · {count.toLocaleString()}</NativeSelectOption>)}
-        </FilterSelect>
+        <MultiFilter name="fsc" label="FSC / item category" value={filters.fsc}
+          options={categories.map(([code, count]) => [code, `FSC ${code} · ${count.toLocaleString()}`])} />
         <FilterSelect name="deadline" label="Quote deadline" value={filters.deadline}>
           <NativeSelectOption value="">Any upcoming date</NativeSelectOption>
           <NativeSelectOption value="today">Due today</NativeSelectOption>
@@ -42,10 +65,7 @@ export function RfqFilters({ filters, categories, activeCount }: {
           <NativeSelectOption value="fortnight">Within 14 days</NativeSelectOption>
           <NativeSelectOption value="later">15+ days to quote</NativeSelectOption>
         </FilterSelect>
-        <FilterSelect name="setAside" label="Set-aside eligibility" value={filters.setAside}>
-          <NativeSelectOption value="">All set-asides</NativeSelectOption>
-          {Object.entries(SET_ASIDES).map(([code, label]) => <NativeSelectOption key={code} value={code}>{label}</NativeSelectOption>)}
-        </FilterSelect>
+        <MultiFilter name="setAside" label="Set-aside eligibility" value={filters.setAside} options={Object.entries(SET_ASIDES)} />
         <FilterSelect name="posted" label="Posted within" value={filters.posted}>
           <NativeSelectOption value="">All loaded dates</NativeSelectOption>
           <NativeSelectOption value="3">Last 3 days</NativeSelectOption>

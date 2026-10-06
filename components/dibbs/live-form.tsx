@@ -24,7 +24,9 @@ export function LiveForm({ children }: { children: ReactNode }) {
     if (!form.current?.checkValidity()) return;
     const next = new URLSearchParams();
     for (const [name, value] of new FormData(form.current)) {
-      if (typeof value === "string" && value && !(name === "sort" && value === "deadline")) next.set(name, value);
+      if (typeof value !== "string" || !value || (name === "sort" && value === "deadline")) continue;
+      // Checked values with the same name form one OR filter.
+      next.set(name, next.has(name) ? `${next.get(name)},${value}` : value);
     }
     // A changed search/filter always starts at page 1. Replace avoids a history
     // entry for every keystroke, while pagination still uses normal links.
@@ -38,6 +40,12 @@ export function LiveForm({ children }: { children: ReactNode }) {
     const fields = Array.from(form.current?.elements ?? []).filter(
       (field): field is HTMLInputElement | HTMLSelectElement => field instanceof HTMLInputElement || field instanceof HTMLSelectElement,
     );
+    for (const name of ["fsc", "setAside"] as const) {
+      const available = fields.filter((field) => field.name === name).map((field) => field.value);
+      if (filters[name].split(",").filter(Boolean).some((value) => !available.includes(value))) {
+        throw new Error(`The requested ${name} is not available in the loaded postings.`);
+      }
+    }
     // Validate all dropdowns before changing anything (e.g. an FSC not loaded).
     for (const field of fields) {
       const value = filters[field.name as keyof Filters];
@@ -47,7 +55,11 @@ export function LiveForm({ children }: { children: ReactNode }) {
     }
     cancelDebounce();
     ownNavigations.current.clear();
-    for (const field of fields) field.value = filters[field.name as keyof Filters] ?? "";
+    for (const field of fields) {
+      const value = filters[field.name as keyof Filters] ?? "";
+      if (field instanceof HTMLInputElement && field.type === "checkbox") field.checked = value.split(",").includes(field.value);
+      else field.value = value;
+    }
     updateResults();
   }
 
@@ -59,7 +71,9 @@ export function LiveForm({ children }: { children: ReactNode }) {
     const values = new URLSearchParams(query);
     for (const field of Array.from(form.current?.elements ?? [])) {
       if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement) {
-        field.value = values.get(field.name) ?? (field.name === "sort" ? "deadline" : "");
+        const value = values.getAll(field.name).join(",") || (field.name === "sort" ? "deadline" : "");
+        if (field instanceof HTMLInputElement && field.type === "checkbox") field.checked = value.split(",").includes(field.value);
+        else field.value = value;
       }
     }
   }, [query]);
@@ -82,7 +96,7 @@ export function LiveForm({ children }: { children: ReactNode }) {
       onChange={(event) => {
         if (!(event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement)) return;
         cancelDebounce();
-        if (event.target instanceof HTMLSelectElement) updateResults();
+        if (event.target instanceof HTMLSelectElement || event.target.type === "checkbox") updateResults();
         else timer.current = setTimeout(updateResults, 300);
       }}
       onClickCapture={(event) => {
